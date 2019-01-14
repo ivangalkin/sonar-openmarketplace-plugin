@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.sonarsource.parent</groupId>
+    <artifactId>parent</artifactId>
+    <version>48</version>
+  </parent>
+
+  <groupId>org.sonarsource.sonarqube</groupId>
+  <artifactId>sonar-openmarketplace-plugin</artifactId>
+  <packaging>sonar-plugin</packaging>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <sonar.buildVersion>6.7</sonar.buildVersion>
+    <sonar.artifact.path>target/${project.artifactId}-${project.version}.jar</sonar.artifact.path>
+    <jdk.min.version>1.8</jdk.min.version>
+    <license.title>Sonar Open Marketplace</license.title>
+    <license.owner>ivangalkin</license.owner>
+    <license.mailto>http://github.com/ivangalkin</license.mailto>
+  </properties>
+
+  <name>Sonar Open Marketplace</name>
+  <version>0.1</version>
+  <description>Add custom repositories to the SonarQube marketplace (SonarQube update center). Allow arbitrary plugins to be installed/updated by means of the marketplace WebUI.</description>
+  <url>https://github.com/ivangalkin/sonar-openmarketplace-plugin</url>
+  <inceptionYear>2018</inceptionYear>
+  <organization>
+    <name>ivangalkin</name>
+    <url>https://github.com/ivangalkin</url>
+  </organization>
+  <licenses>
+    <license>
+      <name>GNU LGPL 3</name>
+      <url>http://www.gnu.org/licenses/lgpl.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <id>ivangalkin</id>
+      <name>ivangalkin</name>
+      <email />
+    </developer>
+  </developers>
+  <scm>
+    <connection>scm:git:https://github.com/ivangalkin/sonar-openmarketplace-plugin.git</connection>
+    <developerConnection>scm:git:https://github.com/ivangalkin/sonar-openmarketplace-plugin.git</developerConnection>
+    <url>https://github.com/ivangalkin/sonar-openmarketplace-plugin</url>
+    <tag>HEAD</tag>
+  </scm>
+  <issueManagement>
+    <system>Git</system>
+    <url>https://github.com/ivangalkin/sonar-openmarketplace-plugin/issues?state=open</url>
+  </issueManagement>
+  <ciManagement>
+  </ciManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.sonarsource.sonarqube</groupId>
+      <artifactId>sonar-plugin-api</artifactId>
+      <version>${sonar.buildVersion}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <version>5.3.2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <version>5.3.2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <version>3.11.1</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.sonarsource.sonar-packaging-maven-plugin</groupId>
+        <artifactId>sonar-packaging-maven-plugin</artifactId>
+        <version>1.17</version>
+        <extensions>true</extensions>
+        <configuration>
+          <pluginKey>openmarketplace</pluginKey>
+          <pluginName>Sonar Open Marketplace</pluginName>
+          <pluginClass>org.sonar.plugins.openmarketplace.OpenMarketplacePlugin</pluginClass>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.1</version>
+        <configuration>
+          <source>${jdk.min.version}</source>
+          <target>${jdk.min.version}</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.19.1</version>
+        <dependencies>
+          <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-surefire-provider</artifactId>
+            <version>1.1.0</version>
+          </dependency>
+          <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.1.0</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
