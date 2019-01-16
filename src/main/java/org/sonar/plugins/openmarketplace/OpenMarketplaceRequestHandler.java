@@ -19,47 +19,87 @@
  */
 package org.sonar.plugins.openmarketplace;
 
+import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Arrays;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.http.HttpStatus;
 import org.sonar.api.config.Configuration;
 import org.sonar.api.server.ws.Request;
 import org.sonar.api.server.ws.RequestHandler;
 import org.sonar.api.server.ws.Response;
+import org.sonar.api.utils.log.Logger;
+import org.sonar.api.utils.log.Loggers;
+import org.sonar.plugins.openmarketplace.repository.RepositoryDescription;
+import org.sonar.plugins.openmarketplace.repository.RepositoryDownloader;
+import org.sonar.plugins.openmarketplace.repository.RepositoryMerger;
+import org.sonar.plugins.openmarketplace.repository.RepositoryValidationException;
 
 public class OpenMarketplaceRequestHandler implements RequestHandler {
 
+  private static final Logger LOG = Loggers.get(OpenMarketplaceRequestHandler.class);
   private Configuration configuration;
 
   public OpenMarketplaceRequestHandler(Configuration c) {
     configuration = c;
   }
 
-  /**
-   * TODO
-   */
+  private Optional<String> downloadAndMerge() throws IOException {
+    LOG.debug("Download original repository: {}", RepositoryDownloader.ORIGINAL_REPOSITORY_URL);
+    RepositoryDescription original = null;
+    try {
+      original = RepositoryDownloader.downloadOriginal();
+    } catch (IOException ioe) {
+      LOG.error("Unable to download original repository {}, exception {}", RepositoryDownloader.ORIGINAL_REPOSITORY_URL,
+          ioe);
+      return Optional.empty();
+    }
+
+    final RepositoryMerger merger = new RepositoryMerger(original);
+
+    for (String customURL : configuration.getStringArray(OpenMarketplacePlugin.SONAR_OPENMARKETPLACE_URLS)) {
+      try {
+        LOG.debug("Append custom repository {}", customURL);
+
+        final RepositoryDescription custom = RepositoryDownloader.download(customURL);
+        custom.validate();
+        merger.addCustomRepository(custom);
+
+        if (LOG.isDebugEnabled()) {
+          final String customPlugins = custom.getPluginIDs().stream().collect(Collectors.joining(","));
+          LOG.debug("Custom plugins were added: [{}] ", customPlugins);
+        }
+      } catch (IOException ioe) {
+        LOG.warn("Unable to download custom repository {}, exception {}", customURL, ioe);
+      } catch (RepositoryValidationException rve) {
+        LOG.warn("Unable to validate custom repository {}, exception {}", customURL, rve);
+      }
+    }
+
+    return Optional.of(merger.merge());
+  }
+
   @Override
   public void handle(Request request, Response response) throws Exception {
-    response.setHeader("Content-Type", "text/plain; charset=ISO-8859-1");
-    OutputStream stream = response.stream().output();
-    String comments = Arrays.stream(configuration.getStringArray(OpenMarketplacePlugin.SONAR_OPENMARKETPLACE_URLS))
-        .map(s -> "# " + s).collect(Collectors.joining("\n"));
-    String out = comments + "\n" + "plugins=cxx\n" + "cxx.category=Languages\n"
-        + "cxx.organization=SonarOpenCommunity\n" + "cxx.scm=https\\://github.com/SonarOpenCommunity/sonar-cxx\n"
-        + "cxx.versions=1.2.0\n" + "cxx.publicVersions=1.2.0\n" + "cxx.description=Code Analyzer for C/C++\n"
-        + "cxx.homepageUrl=https\\://github.com/SonarOpenCommunity/sonar-cxx/wiki\n" + "cxx.developers=\n"
-        + "cxx.issueTrackerUrl=https\\://github.com/SonarOpenCommunity/sonar-cxx/issues\\?state\\=open\n"
-        + "cxx.archivedVersions=\n" + "cxx.name=C++ (Community)\n" + "cxx.license=GNU LGPL 3\n"
-        + "cxx.1.2.0.sqVersions=6.7,6.7.1,6.7.2,6.7.3,6.7.4,6.7.5,6.7.6,7.0,7.1,7.2,7.2.1,7.3,7.4\n"
-        + "cxx.1.2.0.description=Release sonar-cxx version 1.2.0\n"
-        + "cxx.1.2.0.downloadUrl=https\\://github.com/SonarOpenCommunity/sonar-cxx/releases/download/cxx-1.2.0/sonar-cxx-plugin-1.2.0.jar\n"
-        + "cxx.1.2.0.changelogUrl=https\\://github.com/SonarOpenCommunity/sonar-cxx/releases/tag/cxx-1.2.0\n"
-        + "cxx.1.2.0.mavenGroupId=org.sonarsource.sonarqube-plugins.cxx\n" + "cxx.1.2.0.mavenArtifactId=cxx\n"
-        + "cxx.1.2.0.displayVersion=1.2.0\n" + "cxx.1.2.0.date=2018-11-09\n"
-        + "cxx.1.2.0.requiredSonarVersions=6.7,6.7.1,6.7.2,6.7.3,6.7.4,6.7.5,6.7.6,7.0,7.1,7.2,7.2.1,7.3,7.4";
 
-    stream.write(out.getBytes("ISO-8859-1"));
+    Optional<String> mergedRepositories = Optional.empty();
+    try {
+      mergedRepositories = downloadAndMerge();
+    } catch (Exception e) {
+      LOG.error("Unexpected exception while downloading and merging {}", e);
+    }
+
+    if (mergedRepositories.isPresent()) {
+      try (OutputStream stream = response.stream().output()) {
+        response.setHeader("Content-Type", "text/plain; charset=ISO-8859-1");
+        stream.write(mergedRepositories.get().getBytes("ISO-8859-1"));
+      }
+    } else {
+      response.stream().setStatus(HttpStatus.SC_MOVED_TEMPORARILY);
+      response.setHeader("Location", RepositoryDownloader.ORIGINAL_REPOSITORY_URL);
+    }
+
   }
 
 }

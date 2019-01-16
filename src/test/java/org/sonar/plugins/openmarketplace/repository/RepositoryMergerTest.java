@@ -48,10 +48,8 @@ class RepositoryMergerTest {
             "plugin3.description=Description\n" + //
             "plugin3.license=GNU LGPL 3\n";
 
-    final RepositoryDescription originalDesc = new RepositoryDescription(
-        new ByteArrayInputStream(originalFile.getBytes()), "http://original.com");
-    final RepositoryDescription customDesc = new RepositoryDescription(new ByteArrayInputStream(customFile.getBytes()),
-        "http://custom.com");
+    final RepositoryDescription originalDesc = new RepositoryDescription(originalFile, "http://original.com");
+    final RepositoryDescription customDesc = new RepositoryDescription(customFile, "http://custom.com");
 
     final RepositoryMerger merger = new RepositoryMerger(originalDesc);
     merger.addCustomRepository(customDesc);
@@ -94,10 +92,8 @@ class RepositoryMergerTest {
             "plugin1.description=Description\n" + //
             "plugin1.license=GNU LGPL 3\n";
 
-    final RepositoryDescription originalDesc = new RepositoryDescription(
-        new ByteArrayInputStream(originalFile.getBytes()), "http://original.com");
-    final RepositoryDescription customDesc = new RepositoryDescription(new ByteArrayInputStream(customFile.getBytes()),
-        "http://custom.com");
+    final RepositoryDescription originalDesc = new RepositoryDescription(originalFile, "http://original.com");
+    final RepositoryDescription customDesc = new RepositoryDescription(customFile, "http://custom.com");
 
     final RepositoryMerger merger = new RepositoryMerger(originalDesc);
 

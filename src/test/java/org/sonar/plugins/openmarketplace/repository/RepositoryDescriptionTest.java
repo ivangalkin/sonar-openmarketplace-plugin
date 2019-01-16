@@ -19,16 +19,14 @@
  */
 package org.sonar.plugins.openmarketplace.repository;
 
-import java.io.ByteArrayInputStream;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
-import org.sonar.plugins.openmarketplace.repository.RepositoryDescription;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class RepositoryDescriptionTest {
 
@@ -42,8 +40,7 @@ class RepositoryDescriptionTest {
             "key3=value3\n" + //
             "key4=\n";
 
-    final RepositoryDescription desc = new RepositoryDescription(new ByteArrayInputStream(file.getBytes()),
-        "http://repo.com");
+    final RepositoryDescription desc = new RepositoryDescription(file, "http://repo.com");
     assertThat(desc.getUrl()).isEqualTo("http://repo.com");
 
     final Set<String> pluginIDs = desc.getPluginIDs();
@@ -65,7 +62,7 @@ class RepositoryDescriptionTest {
             "key3=value3\n";
 
     final RepositoryValidationException e = assertThrows(RepositoryValidationException.class, () -> {
-      new RepositoryDescription(new ByteArrayInputStream(file.getBytes()), "http://rep0.com");
+      new RepositoryDescription(file, "http://rep0.com");
     });
 
     assertThat(e).hasMessage("Repository 'http://rep0.com' doesn't contain a list of plugins (key = plugins)");
@@ -85,7 +82,7 @@ class RepositoryDescriptionTest {
             "plugin0.1.3.description=Description\n" + //
             "plugin0.1.3.mavenArtifactId=sonar-plugin0-plugin\n" + //
             "plugin0.name=Name\n";
-    new RepositoryDescription(new ByteArrayInputStream(file.getBytes()), "http://rep0.com").validate();
+    new RepositoryDescription(file, "http://rep0.com").validate();
   }
 
   void testValidateOk1() {
@@ -102,7 +99,7 @@ class RepositoryDescriptionTest {
             "plugin1.1.3.description=Description\n" + //
             "plugin1.1.3.mavenArtifactId=sonar-plugin0-plugin\n" + //
             "plugin1.name=Name\n";
-    new RepositoryDescription(new ByteArrayInputStream(file.getBytes()), "http://rep0.com").validate();
+    new RepositoryDescription(file, "http://rep0.com").validate();
   }
 
   @Test
@@ -114,8 +111,7 @@ class RepositoryDescriptionTest {
             "key3=value3\n" + //
             "plugins=\n";
 
-    RepositoryDescription desc = new RepositoryDescription(new ByteArrayInputStream(file.getBytes()),
-        "http://rep0.com");
+    RepositoryDescription desc = new RepositoryDescription(file, "http://rep0.com");
 
     final RepositoryValidationException e = assertThrows(RepositoryValidationException.class, () -> {
       desc.validate();
@@ -133,8 +129,7 @@ class RepositoryDescriptionTest {
             "key3=value3\n" + //
             "plugins=,,, , ,, , ,, \n";
 
-    RepositoryDescription desc = new RepositoryDescription(new ByteArrayInputStream(file.getBytes()),
-        "http://rep1.com");
+    RepositoryDescription desc = new RepositoryDescription(file, "http://rep1.com");
 
     final RepositoryValidationException e = assertThrows(RepositoryValidationException.class, () -> {
       desc.validate();
@@ -159,8 +154,7 @@ class RepositoryDescriptionTest {
             "plugin1.1.3.mavenArtifactId=sonar-plugin0-plugin\n" + //
             "plugin2.name=Name\n"; // <<= plugin2 is not registered
 
-    RepositoryDescription desc = new RepositoryDescription(new ByteArrayInputStream(file.getBytes()),
-        "http://rep2.com");
+    RepositoryDescription desc = new RepositoryDescription(file, "http://rep2.com");
 
     final RepositoryValidationException e = assertThrows(RepositoryValidationException.class, () -> {
       desc.validate();

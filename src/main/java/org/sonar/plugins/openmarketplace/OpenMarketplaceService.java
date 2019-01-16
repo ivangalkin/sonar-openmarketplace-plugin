@@ -28,7 +28,7 @@ import org.sonar.api.server.ws.WebService;
 public class OpenMarketplaceService implements WebService {
 
   private static final String ENDPOINT_NAME = "update-center.properties";
-  private static final String ENDPOINT_PATH = "api/update-center";
+  private static final String ENDPOINT_PATH = "api/openmarketplace";
 
   final private Configuration configuration;
 

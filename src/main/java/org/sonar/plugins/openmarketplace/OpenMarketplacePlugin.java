@@ -22,10 +22,12 @@ package org.sonar.plugins.openmarketplace;
 import org.sonar.api.Plugin;
 import org.sonar.api.config.PropertyDefinition;
 import org.sonar.api.resources.Qualifiers;
+import org.sonar.plugins.openmarketplace.repository.RepositoryDownloader;
 
 public class OpenMarketplacePlugin implements Plugin {
 
   public static final String SONAR_OPENMARKETPLACE_URLS = "sonar.openmarketplace.urls";
+  public static final String OPENMARKETPLACE_CUSTOM_REPOSITORY = "https://raw.githubusercontent.com/ivangalkin/sonar-openmarketplace-plugin/master/update-center.properties";
 
   @Override
   public void define(Context context) {
@@ -33,12 +35,10 @@ public class OpenMarketplacePlugin implements Plugin {
 
     final String subcateg = "(1) General";
     PropertyDefinition urlProperty = PropertyDefinition.builder("sonar.customupdatecenter.urls")
-        .defaultValue(
-            "https://raw.githubusercontent.com/ivangalkin/sonar-cxx.updatecenter.url/master/update-center.properties")
-        .multiValues(true).name("URLs to the custom repositories")
+        .defaultValue(OPENMARKETPLACE_CUSTOM_REPOSITORY).multiValues(true).name("URLs to the custom repositories")
         .description("URLs to the property files, which represents a custom plugin repository. "
-            + "These files will be appended to the original repository "
-            + "(see https://update.sonarsource.org/update-center.properties).")
+            + "These files will be appended to the original repository " + "(see "
+            + RepositoryDownloader.ORIGINAL_REPOSITORY_URL + ").")
         .subCategory(subcateg).onQualifiers(Qualifiers.APP).index(1).build();
 
     context.addExtension(urlProperty);

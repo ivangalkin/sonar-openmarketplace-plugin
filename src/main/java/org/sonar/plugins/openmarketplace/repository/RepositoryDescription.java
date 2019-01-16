@@ -19,6 +19,7 @@
  */
 package org.sonar.plugins.openmarketplace.repository;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -44,11 +45,11 @@ public class RepositoryDescription {
    *          each exported plugin.
    * @throws IOException
    */
-  public RepositoryDescription(InputStream input, String url) {
+  public RepositoryDescription(String content, String url) {
 
     this.url = url;
     this.pluginProperties = new Properties();
-    try {
+    try (final InputStream input = new ByteArrayInputStream(content.getBytes())) {
       pluginProperties.load(input);
     } catch (IOException e) {
       throw new RepositoryValidationException("Unable to read repository '" + url + "': " + e.getMessage());
@@ -65,6 +66,26 @@ public class RepositoryDescription {
         .collect(Collectors.toSet());
   }
 
+  /**
+   * Make sure, that
+   * <ol>
+   * <li>list of plugins is not empty</li>
+   * <li>the repository provides properties only for its own plugins (all keys
+   * have the following format: <code>pluginID.property0[.property1 ...
+   * .propertyN]</code></li>
+   * </ol>
+   *
+   * IMPORTANT: the second test cannot be applied to the original repository. It
+   * contains some meta-data about SonarQube. For now there are
+   * <ul>
+   * <li>date</li>
+   * <li>publicVersions</li>
+   * <li>6</li>
+   * <li>7</li>
+   * <li>sonar</li>
+   * <li>ltsVersion</li>
+   * </ul>
+   */
   public void validate() {
     // make sure list of plugins is not empty
     if (pluginIDs.isEmpty()) {
