@@ -21,59 +21,80 @@ package org.sonar.plugins.openmarketplace;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.apache.http.HttpStatus;
 import org.sonar.api.config.Configuration;
 import org.sonar.api.server.ws.Request;
 import org.sonar.api.server.ws.RequestHandler;
 import org.sonar.api.server.ws.Response;
+import org.sonar.api.utils.HttpDownloader;
 import org.sonar.api.utils.log.Logger;
 import org.sonar.api.utils.log.Loggers;
 import org.sonar.plugins.openmarketplace.repository.RepositoryDescription;
-import org.sonar.plugins.openmarketplace.repository.RepositoryDownloader;
 import org.sonar.plugins.openmarketplace.repository.RepositoryMerger;
 import org.sonar.plugins.openmarketplace.repository.RepositoryValidationException;
 
 public class OpenMarketplaceRequestHandler implements RequestHandler {
 
   private static final Logger LOG = Loggers.get(OpenMarketplaceRequestHandler.class);
-  private Configuration configuration;
+  private static final int SC_MOVED_TEMPORARILY = 302;
 
-  public OpenMarketplaceRequestHandler(Configuration c) {
+  private final Configuration configuration;
+  private final HttpDownloader downloader;
+
+  public OpenMarketplaceRequestHandler(Configuration c, HttpDownloader d) {
     configuration = c;
+    downloader = d;
   }
 
-  private Optional<String> downloadAndMerge() throws IOException {
-    LOG.debug("Download original repository: {}", RepositoryDownloader.ORIGINAL_REPOSITORY_URL);
+  private RepositoryDescription download(String url) throws IOException, URISyntaxException {
+    final URI uri = new URI(url);
+    final String encoding = StandardCharsets.UTF_8.name();
+    String content = null;
+    try {
+      content = downloader.downloadPlainText(uri, encoding);
+    } catch (Exception e) {
+      throw new IOException(e);
+    }
+    return new RepositoryDescription(content, url);
+  }
+
+  private Optional<String> mergeAll() throws IOException {
+    LOG.debug("Download original repository: {}", OpenMarketplaceTrustedRepositories.ORIGINAL_REPOSITORY_URL);
     RepositoryDescription original = null;
     try {
-      original = RepositoryDownloader.downloadOriginal();
-    } catch (IOException ioe) {
-      LOG.error("Unable to download original repository {}, exception {}", RepositoryDownloader.ORIGINAL_REPOSITORY_URL,
-          ioe);
+      original = download(OpenMarketplaceTrustedRepositories.ORIGINAL_REPOSITORY_URL);
+    } catch (IOException | URISyntaxException ioe) {
+      LOG.error("Unable to download original repository {}, exception {}",
+          OpenMarketplaceTrustedRepositories.ORIGINAL_REPOSITORY_URL, ioe.getMessage());
       return Optional.empty();
     }
 
     final RepositoryMerger merger = new RepositoryMerger(original);
 
-    for (String customURL : configuration.getStringArray(OpenMarketplacePlugin.SONAR_OPENMARKETPLACE_URLS)) {
+    for (String urlProperty : configuration.getStringArray(OpenMarketplacePlugin.SONAR_OPENMARKETPLACE_URLS)) {
+      final String customURL = urlProperty.trim();
+      if (customURL.isEmpty()) {
+        continue;
+      }
+
       try {
         LOG.debug("Append custom repository {}", customURL);
 
-        final RepositoryDescription custom = RepositoryDownloader.download(customURL);
+        final RepositoryDescription custom = download(customURL);
         custom.validate();
         merger.addCustomRepository(custom);
 
-        if (LOG.isDebugEnabled()) {
-          final String customPlugins = custom.getPluginIDs().stream().collect(Collectors.joining(","));
-          LOG.debug("Custom plugins were added: [{}] ", customPlugins);
-        }
-      } catch (IOException ioe) {
-        LOG.warn("Unable to download custom repository {}, exception {}", customURL, ioe);
+        final String customPlugins = custom.getPluginIDs().stream().collect(Collectors.joining(","));
+        LOG.info("Custom repository was added url='{}' plugins=[{}] ", customURL, customPlugins);
+      } catch (IOException | URISyntaxException ioe) {
+        LOG.warn("Unable to download custom repository {}, exception {}", customURL, ioe.getMessage());
       } catch (RepositoryValidationException rve) {
-        LOG.warn("Unable to validate custom repository {}, exception {}", customURL, rve);
+        LOG.warn("Unable to validate custom repository {}, exception {}", customURL, rve.getMessage());
       }
     }
 
@@ -85,7 +106,7 @@ public class OpenMarketplaceRequestHandler implements RequestHandler {
 
     Optional<String> mergedRepositories = Optional.empty();
     try {
-      mergedRepositories = downloadAndMerge();
+      mergedRepositories = mergeAll();
     } catch (Exception e) {
       LOG.error("Unexpected exception while downloading and merging {}", e);
     }
@@ -96,8 +117,8 @@ public class OpenMarketplaceRequestHandler implements RequestHandler {
         stream.write(mergedRepositories.get().getBytes("ISO-8859-1"));
       }
     } else {
-      response.stream().setStatus(HttpStatus.SC_MOVED_TEMPORARILY);
-      response.setHeader("Location", RepositoryDownloader.ORIGINAL_REPOSITORY_URL);
+      response.stream().setStatus(SC_MOVED_TEMPORARILY);
+      response.setHeader("Location", OpenMarketplaceTrustedRepositories.ORIGINAL_REPOSITORY_URL);
     }
 
   }

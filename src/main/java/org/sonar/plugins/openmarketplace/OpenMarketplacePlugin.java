@@ -21,32 +21,49 @@ package org.sonar.plugins.openmarketplace;
 
 import org.sonar.api.Plugin;
 import org.sonar.api.config.PropertyDefinition;
-import org.sonar.api.resources.Qualifiers;
-import org.sonar.plugins.openmarketplace.repository.RepositoryDownloader;
 
 public class OpenMarketplacePlugin implements Plugin {
 
   public static final String SONAR_OPENMARKETPLACE_URLS = "sonar.openmarketplace.urls";
-  public static final String OPENMARKETPLACE_CUSTOM_REPOSITORY = "https://raw.githubusercontent.com/ivangalkin/sonar-openmarketplace-plugin/master/update-center.properties";
+
+  private static final String UPDATECENTER_RELATIVE_URL = "/" + OpenMarketplaceService.CONTROLLER_PATH + "/"
+      + OpenMarketplaceService.ACTION_PATH;
+  private static final String UPDATECENTER_ABSOLUTE_URL = "http\\\\://localhost[:port]" + UPDATECENTER_RELATIVE_URL;
+
+  private static String href(String url, String text) {
+    return String.format("<a href=\"%s\">%s</a>", url, text);
+  }
+
+  private static String href(String url) {
+    return href(url, url);
+  }
 
   @Override
   public void define(Context context) {
     context.addExtension(OpenMarketplaceService.class);
 
     final String subcateg = "(1) General";
-    PropertyDefinition urlProperty = PropertyDefinition.builder("sonar.customupdatecenter.urls")
-        .defaultValue(OPENMARKETPLACE_CUSTOM_REPOSITORY).multiValues(true).name("URLs to the custom repositories")
-        .description("URLs to the property files, which represents a custom plugin repository. "
-            + "These files will be appended to the original repository " + "(see "
-            + RepositoryDownloader.ORIGINAL_REPOSITORY_URL + ").")
-        .subCategory(subcateg).onQualifiers(Qualifiers.APP).index(1).build();
+    PropertyDefinition urlProperty = PropertyDefinition.builder(SONAR_OPENMARKETPLACE_URLS) //
+        .defaultValue(OpenMarketplaceTrustedRepositories.OPENMARKETPLACE_REPOSITORY_URL) //
+        .multiValues(true) //
+        .name("URLs to the custom repositories") //
+        .description(
+            "URLs to the plain-text properties files. Each of them must represent a valid plugin repository (see online documentation for the format description). "
+                + "The given files will be downloaded and appended to the "
+                + href(OpenMarketplaceTrustedRepositories.ORIGINAL_REPOSITORY_URL, "original repository") + ". "
+                + "The result will be provided under " + href(UPDATECENTER_RELATIVE_URL) + ". "
+                + "Please add the line <code>sonar.updatecenter.url=" + UPDATECENTER_ABSOLUTE_URL + "</code> "
+                + "to sonar.properties in order to enable the Open Marketplace.")//
+        .subCategory(subcateg) //
+        .index(1) //
+        .build();
 
     context.addExtension(urlProperty);
   }
 
   @Override
   public String toString() {
-    return getClass().getSimpleName();
+    return "Open Marketplace";
   }
 
 }

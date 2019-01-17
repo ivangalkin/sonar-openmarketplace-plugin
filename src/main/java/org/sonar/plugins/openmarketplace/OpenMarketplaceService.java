@@ -21,26 +21,32 @@ package org.sonar.plugins.openmarketplace;
 
 import org.sonar.api.config.Configuration;
 import org.sonar.api.server.ws.WebService;
+import org.sonar.api.utils.HttpDownloader;
 
 /**
  * {@link WebService} is available since SonarQube 4.2
  */
 public class OpenMarketplaceService implements WebService {
 
-  private static final String ENDPOINT_NAME = "update-center.properties";
-  private static final String ENDPOINT_PATH = "api/openmarketplace";
+  public static final String CONTROLLER_PATH = "api/openmarketplace";
+  public static final String ACTION_PATH = "updatecenter";
 
-  final private Configuration configuration;
+  private final Configuration configuration;
+  private final HttpDownloader downloader;
 
-  public OpenMarketplaceService(Configuration c) {
+  public OpenMarketplaceService(Configuration c, HttpDownloader d) {
     configuration = c;
+    downloader = d;
   }
 
   @Override
   public void define(Context context) {
-    NewController controller = context.createController(ENDPOINT_PATH);
-    controller.createAction("properties").setDescription(ENDPOINT_NAME)
-        .setHandler(new OpenMarketplaceRequestHandler(configuration));
+    NewController controller = context.createController(CONTROLLER_PATH);
+    controller.createAction(ACTION_PATH) //
+        .setDescription("Merge multiple repositories into one property file") //
+        .setHandler(new OpenMarketplaceRequestHandler(configuration, downloader))//
+        .setSince("6.7") //
+        .setInternal(false); //
     controller.done();
   }
 }
