@@ -1,6 +1,6 @@
 /*
- * Sonar Open Marketplace
- * Copyright (C) 2018-2018 ivangalkin
+ * Open Marketplace plugin for SonarQube
+ * Copyright (C) 2018-2019 ivangalkin
  * http://github.com/ivangalkin
  *
  * This program is free software; you can redistribute it and/or

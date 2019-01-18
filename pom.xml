@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.sonarsource.parent</groupId>
     <artifactId>parent</artifactId>
-    <version>48</version>
+    <version>49</version>
   </parent>
 
   <groupId>org.sonarsource.sonarqube</groupId>
@@ -19,12 +19,12 @@
     <sonar.buildVersion>6.7</sonar.buildVersion>
     <sonar.artifact.path>target/${project.artifactId}-${project.version}.jar</sonar.artifact.path>
     <jdk.min.version>1.8</jdk.min.version>
-    <license.title>Sonar Open Marketplace</license.title>
+    <license.title>Open Marketplace plugin for SonarQube</license.title>
     <license.owner>ivangalkin</license.owner>
     <license.mailto>http://github.com/ivangalkin</license.mailto>
   </properties>
 
-  <name>Sonar Open Marketplace</name>
+  <name>Open Marketplace</name>
   <version>0.1</version>
   <description>Add custom repositories to the SonarQube marketplace (SonarQube update center). Allow arbitrary plugins to be installed/updated by means of the marketplace WebUI.</description>
   <url>https://github.com/ivangalkin/sonar-openmarketplace-plugin</url>
@@ -97,7 +97,7 @@
         <extensions>true</extensions>
         <configuration>
           <pluginKey>openmarketplace</pluginKey>
-          <pluginName>Sonar Open Marketplace</pluginName>
+          <pluginName>Open Marketplace</pluginName>
           <pluginClass>org.sonar.plugins.openmarketplace.OpenMarketplacePlugin</pluginClass>
         </configuration>
       </plugin>
