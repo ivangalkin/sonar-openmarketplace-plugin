@@ -29,7 +29,8 @@ import org.sonar.api.utils.HttpDownloader;
 public class OpenMarketplaceService implements WebService {
 
   public static final String CONTROLLER_PATH = "api/openmarketplace";
-  public static final String ACTION_PATH = "updatecenter";
+  public static final String UPDATECENTER_ACTION_PATH = "updatecenter";
+  public static final String SELFTEST_ACTION_PATH = "selftest";
 
   private final Configuration configuration;
   private final HttpDownloader downloader;
@@ -42,9 +43,14 @@ public class OpenMarketplaceService implements WebService {
   @Override
   public void define(Context context) {
     NewController controller = context.createController(CONTROLLER_PATH);
-    controller.createAction(ACTION_PATH) //
+    controller.createAction(UPDATECENTER_ACTION_PATH) //
         .setDescription("Merge multiple repositories into one property file") //
-        .setHandler(new OpenMarketplaceRequestHandler(configuration, downloader))//
+        .setHandler(new OpenMarketplaceUpdatecenterHandler(configuration, downloader))//
+        .setSince("6.7") //
+        .setInternal(false); //
+    controller.createAction(SELFTEST_ACTION_PATH) //
+        .setDescription("Perform a self test of Open Marketplace settings") //
+        .setHandler(new OpenMarketplaceSelftestHandler(configuration, downloader))//
         .setSince("6.7") //
         .setInternal(false); //
     controller.done();

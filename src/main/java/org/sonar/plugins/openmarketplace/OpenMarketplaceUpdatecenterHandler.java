@@ -38,15 +38,15 @@ import org.sonar.plugins.openmarketplace.repository.RepositoryDescription;
 import org.sonar.plugins.openmarketplace.repository.RepositoryMerger;
 import org.sonar.plugins.openmarketplace.repository.RepositoryValidationException;
 
-public class OpenMarketplaceRequestHandler implements RequestHandler {
+public class OpenMarketplaceUpdatecenterHandler implements RequestHandler {
 
-  private static final Logger LOG = Loggers.get(OpenMarketplaceRequestHandler.class);
+  private static final Logger LOG = Loggers.get(OpenMarketplaceUpdatecenterHandler.class);
   private static final int SC_MOVED_TEMPORARILY = 302;
 
   private final Configuration configuration;
   private final HttpDownloader downloader;
 
-  public OpenMarketplaceRequestHandler(Configuration c, HttpDownloader d) {
+  public OpenMarketplaceUpdatecenterHandler(Configuration c, HttpDownloader d) {
     configuration = c;
     downloader = d;
   }
@@ -95,6 +95,9 @@ public class OpenMarketplaceRequestHandler implements RequestHandler {
         LOG.warn("Unable to download custom repository {}, exception {}", customURL, ioe.getMessage());
       } catch (RepositoryValidationException rve) {
         LOG.warn("Unable to validate custom repository {}, exception {}", customURL, rve.getMessage());
+      } catch (Exception e) {
+        LOG.warn("Unexpected exception while processing of  custom repository {}, exception {}", customURL,
+            e.getMessage());
       }
     }
 
@@ -108,7 +111,7 @@ public class OpenMarketplaceRequestHandler implements RequestHandler {
     try {
       mergedRepositories = mergeAll();
     } catch (Exception e) {
-      LOG.error("Unexpected exception while downloading and merging {}", e);
+      LOG.error("Unexpected exception while downloading and merging {}", e.getMessage());
     }
 
     if (mergedRepositories.isPresent()) {

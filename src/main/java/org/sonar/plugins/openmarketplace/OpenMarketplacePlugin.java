@@ -27,8 +27,11 @@ public class OpenMarketplacePlugin implements Plugin {
   public static final String SONAR_OPENMARKETPLACE_URLS = "sonar.openmarketplace.urls";
 
   private static final String UPDATECENTER_RELATIVE_URL = "/" + OpenMarketplaceService.CONTROLLER_PATH + "/"
-      + OpenMarketplaceService.ACTION_PATH;
-  private static final String UPDATECENTER_ABSOLUTE_URL = "http\\\\://localhost[:port]" + UPDATECENTER_RELATIVE_URL;
+      + OpenMarketplaceService.UPDATECENTER_ACTION_PATH;
+  private static final String SELFTEST_RELATIVE_URL = "/" + OpenMarketplaceService.CONTROLLER_PATH + "/"
+      + OpenMarketplaceService.SELFTEST_ACTION_PATH;
+
+  private static final String UPDATECENTER_ABSOLUTE_URL = "http\\://localhost\\:9000" + UPDATECENTER_RELATIVE_URL;
 
   private static String href(String url, String text) {
     return String.format("<a href=\"%s\">%s</a>", url, text);
@@ -47,13 +50,16 @@ public class OpenMarketplacePlugin implements Plugin {
         .defaultValue(OpenMarketplaceTrustedRepositories.OPENMARKETPLACE_REPOSITORY_URL) //
         .multiValues(true) //
         .name("URLs to the custom repositories") //
-        .description(
-            "URLs to the plain-text properties files. Each of them must represent a valid plugin repository (see online documentation for the format description). "
-                + "The given files will be downloaded and appended to the "
-                + href(OpenMarketplaceTrustedRepositories.ORIGINAL_REPOSITORY_URL, "original repository") + ". "
-                + "The result will be provided under " + href(UPDATECENTER_RELATIVE_URL) + ". "
-                + "Please add the line <code>sonar.updatecenter.url=" + UPDATECENTER_ABSOLUTE_URL + "</code> "
-                + "to sonar.properties in order to enable the Open Marketplace.")//
+        .description("URLs to the plain-text properties files. " + //
+            "Each of them must represent a valid plugin repository "
+            + "(see online documentation for the format description). "
+            + "The given files will be downloaded and appended to the "
+            + href(OpenMarketplaceTrustedRepositories.ORIGINAL_REPOSITORY_URL, "original repository") + ". "
+            + "The result will be provided under " + href(UPDATECENTER_RELATIVE_URL) + ". "
+            + "Please add the line <code>sonar.updatecenter.url=" + UPDATECENTER_ABSOLUTE_URL + "</code> "
+            + "to sonar.properties in order to enable the Open Marketplace "
+            + "(replace 9000 with the value of <code>sonar.web.port</code> if default was changed). "
+            + "Please visit the " + href(SELFTEST_RELATIVE_URL, "diagnostics page") + " for more info.")//
         .subCategory(subcateg) //
         .index(1) //
         .build();
