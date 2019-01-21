@@ -25,7 +25,7 @@
   </properties>
 
   <name>Open Marketplace</name>
-  <version>0.1</version>
+  <version>0.2</version>
   <description>Add custom repositories to the SonarQube marketplace (SonarQube update center). Allow arbitrary plugins to be installed/updated by means of the marketplace WebUI.</description>
   <url>https://github.com/ivangalkin/sonar-openmarketplace-plugin</url>
   <inceptionYear>2018</inceptionYear>
