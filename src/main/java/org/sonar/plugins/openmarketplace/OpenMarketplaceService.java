@@ -23,13 +23,22 @@ import org.sonar.api.config.Configuration;
 import org.sonar.api.server.ws.WebService;
 import org.sonar.api.utils.HttpDownloader;
 
-/**
- * {@link WebService} is available since SonarQube 4.2
- */
 public class OpenMarketplaceService implements WebService {
 
-  public static final String CONTROLLER_PATH = "api/openmarketplace";
-  public static final String UPDATECENTER_ACTION_PATH = "updatecenter";
+  /**
+   * <code>/setup/*</code> doesn't require a user session (see
+   * {@link org.sonar.server.authentication.UserSessionInitializer}). It's
+   * important to use this controller path, otherwise the resource will be not
+   * available if <code>sonar.forceAuthentication</code> was enabled.
+   */
+  public static final String UPDATECENTER_CONTROLLER_PATH = "setup";
+  public static final String UPDATECENTER_ACTION_PATH = "openmarketplace";
+
+  /**
+   * <code>/api/openmarketplace/selftest</code> is protected by regular
+   * authentication rules.
+   */
+  public static final String SELFTEST_CONTROLLER_PATH = "api/openmarketplace";
   public static final String SELFTEST_ACTION_PATH = "selftest";
 
   private final Configuration configuration;
@@ -42,17 +51,20 @@ public class OpenMarketplaceService implements WebService {
 
   @Override
   public void define(Context context) {
-    NewController controller = context.createController(CONTROLLER_PATH);
-    controller.createAction(UPDATECENTER_ACTION_PATH) //
+    final NewController updateCenterController = context.createController(UPDATECENTER_CONTROLLER_PATH);
+    updateCenterController.createAction(UPDATECENTER_ACTION_PATH) //
         .setDescription("Merge multiple repositories into one property file") //
         .setHandler(new OpenMarketplaceUpdatecenterHandler(configuration, downloader))//
         .setSince("6.7") //
         .setInternal(false); //
-    controller.createAction(SELFTEST_ACTION_PATH) //
+    updateCenterController.done();
+
+    final NewController selfTestController = context.createController(SELFTEST_CONTROLLER_PATH);
+    selfTestController.createAction(SELFTEST_ACTION_PATH) //
         .setDescription("Perform a self test of Open Marketplace settings") //
         .setHandler(new OpenMarketplaceSelftestHandler(configuration, downloader))//
         .setSince("6.7") //
         .setInternal(false); //
-    controller.done();
+    selfTestController.done();
   }
 }

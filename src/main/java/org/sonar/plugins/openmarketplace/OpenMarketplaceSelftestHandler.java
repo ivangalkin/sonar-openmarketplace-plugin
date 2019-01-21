@@ -192,7 +192,7 @@ public class OpenMarketplaceSelftestHandler implements RequestHandler {
 
     final Integer webPort = configuration.getInt("sonar.web.port").orElse(9000);
     final String suggestedURL = String.format("http://localhost:%d/%s/%s", webPort,
-        OpenMarketplaceService.CONTROLLER_PATH, OpenMarketplaceService.UPDATECENTER_ACTION_PATH);
+        OpenMarketplaceService.UPDATECENTER_CONTROLLER_PATH, OpenMarketplaceService.UPDATECENTER_ACTION_PATH);
 
     html.append(createINFO("Suggested settings for sonar.properties are <code>sonar.updatecenter.url="
         + suggestedURL.replaceAll(Pattern.quote(":"), Matcher.quoteReplacement("\\:")) + "</code>"));

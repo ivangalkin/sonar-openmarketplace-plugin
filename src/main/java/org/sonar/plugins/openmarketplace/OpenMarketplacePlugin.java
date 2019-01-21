@@ -26,9 +26,9 @@ public class OpenMarketplacePlugin implements Plugin {
 
   public static final String SONAR_OPENMARKETPLACE_URLS = "sonar.openmarketplace.urls";
 
-  private static final String UPDATECENTER_RELATIVE_URL = "/" + OpenMarketplaceService.CONTROLLER_PATH + "/"
+  private static final String UPDATECENTER_RELATIVE_URL = "/" + OpenMarketplaceService.UPDATECENTER_CONTROLLER_PATH + "/"
       + OpenMarketplaceService.UPDATECENTER_ACTION_PATH;
-  private static final String SELFTEST_RELATIVE_URL = "/" + OpenMarketplaceService.CONTROLLER_PATH + "/"
+  private static final String SELFTEST_RELATIVE_URL = "/" + OpenMarketplaceService.SELFTEST_CONTROLLER_PATH + "/"
       + OpenMarketplaceService.SELFTEST_ACTION_PATH;
 
   private static final String UPDATECENTER_ABSOLUTE_URL = "http\\://localhost\\:9000" + UPDATECENTER_RELATIVE_URL;
