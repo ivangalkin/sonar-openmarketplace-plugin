@@ -3,10 +3,10 @@ Add custom repositories to the SonarQube marketplace (SonarQube update center). 
 
 # Are you SonarQube admin?
 
-1. Download the JAR file into `<sonar installation directory>/extensions/plugins/` (e.g. `/opt/sonar/extensions/plugins/`)
-2. Put the line `sonar.updatecenter.url=http\://localhost\:9000/api/openmarketplace/updatecenter` at the bottom of the file  `<sonar installation directory>/conf/sonar.properties` (you might want to adjust the port 9000 according to your customization of `sonar.web.port` if there is any)
+1. Download the JAR file into `<sonar installation home>/extensions/plugins/` (e.g. `/opt/sonar/extensions/plugins/`)
+2. Put the line `sonar.updatecenter.url=http\://localhost\:9000/setup/openmarketplace` at the bottom of the file  `<sonar installation home>/conf/sonar.properties` (you might want to adjust the port 9000 according to your customization of `sonar.web.port` if there is any)
 3. Restart your SonarQube server
-4. Now you can add custom plugin repositories additionally to the original one.
+4. Now you can add custom plugin repositories additionally to the original one
    * Go to `http://<sonarserver>/admin/settings?category=open+marketplace`
    * Parametrize your custom repositories
    * Validate your configuration by means of the selftest: `http://<sonarserver>/api/openmarketplace/selftest`
@@ -53,7 +53,7 @@ yourplugin.0.1.downloadUrl=
 yourplugin.0.1.date=
 ```
 
-You might want to use the [original repository](https://update.sonarsource.org/update-center.properties) or [our repository](https://raw.githubusercontent.com/ivangalkin/sonar-openmarketplace-plugin/master/update-center.properties) as example. Please pay your attention to the key `publicVersions` from the original repository. It will give you the full list of available SonarQube version, which is...
+You might want to use the [original repository](https://update.sonarsource.org/update-center.properties) or [our repository](https://raw.githubusercontent.com/ivangalkin/sonar-openmarketplace-plugin/master/update-center.properties) as an example. Please pay your attention to the key `publicVersions` from the original repository. It will give you the full list of available SonarQube version, which is...
 ```properties
 publicVersions=6.7,6.7.1,6.7.2,6.7.3,6.7.4,6.7.5,6.7.6,7.0,7.1,7.2,7.2.1,7.3,7.4,7.5
 ```
@@ -61,7 +61,7 @@ publicVersions=6.7,6.7.1,6.7.2,6.7.3,6.7.4,6.7.5,6.7.6,7.0,7.1,7.2,7.2.1,7.3,7.4
 
 **BENEFITS**:  
 
-1. There is an [official way](https://docs.sonarqube.org/display/DEV/Deploying+to+the+Marketplace) to deploy your plugin through the Marketplace. Unfortunately the rules are very restrictive. If your plugin gets rejected, there will be no other way than to install you plugin through the file system. This is inconvenient. So your plugin will be installed/updated less often. Open Marketplace being installed once, integrates 3rd party plugins as the 1st class citizens.
+1. There is an [official way](https://docs.sonarqube.org/display/DEV/Deploying+to+the+Marketplace) to deploy your plugin into the Marketplace. Unfortunately the rules are very restrictive. If your plugin gets rejected, there will be no other way than to install you plugin through the file system. This is inconvenient. So your plugin will be installed/updated less often. Open Marketplace being installed once, integrates 3rd party plugins as the 1st class citizens.
 
 2. SonarQube Marketplace ensures the compatibility of installed SonarQube version with the available plugins. If your plugin is not deployed officially, you must keep track of the compatibility by yourself. This is error-prone, since the file-system-based installation and update are not validated automatically. Open Marketplace allows you and your users to benefit from the consistency checks.
 
