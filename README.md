@@ -1,4 +1,4 @@
-# sonar-openmarketplace-plugin
+# sonar-openmarketplace-plugin / Open Marketplace for SonarQube
 Add custom repositories to the SonarQube marketplace (SonarQube update center). Allow arbitrary plugins to be installed/updated by means of the marketplace WebUI.
 
 # Are you SonarQube admin?
