@@ -9,6 +9,7 @@ Add custom repositories to the SonarQube marketplace (SonarQube update center). 
 * [Disclosure](#disclosure)
 
 <a name="for_admins"/>
+
 # Are you SonarQube admin?
 
 1. Download the JAR file into `<sonar installation home>/extensions/plugins/` (e.g. `/opt/sonar/extensions/plugins/`)
@@ -25,6 +26,7 @@ Add custom repositories to the SonarQube marketplace (SonarQube update center). 
 **ATTENTION:** SonarQube plugins might be harmful. Be careful, which URLs you use as your additional repositories! Use only trusted plugins and repositories! You use the Open Marketplace at your own risk.
 
 <a name="for_developers"/>
+
 # Are you plugin developer?
 
 1. Publish a plain text description of your plugin.
@@ -75,6 +77,7 @@ publicVersions=6.7,6.7.1,6.7.2,6.7.3,6.7.4,6.7.5,6.7.6,7.0,7.1,7.2,7.2.1,7.3,7.4
 2. SonarQube Marketplace ensures the compatibility of installed SonarQube version with the available plugins. If your plugin is not deployed officially, you must keep track of the compatibility by yourself. This is error-prone, since the file-system-based installation and update are not validated automatically. Open Marketplace allows you and your users to benefit from the consistency checks.
 
 <a name="for_admins"/>
+
 # How it works
 
 <a name="disclosure"/>
