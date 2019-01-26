@@ -3,6 +3,12 @@
 
 Add custom repositories to the SonarQube marketplace (SonarQube update center). Allow arbitrary plugins to be installed/updated by means of the marketplace WebUI.
 
+* [For SonarQube admins](#for_admins)
+* [For plugin developers](#for_developers)
+* [How it works](#how_it_works)
+* [Disclosure](#disclosure)
+
+<a name="for_admins"/>
 # Are you SonarQube admin?
 
 1. Download the JAR file into `<sonar installation home>/extensions/plugins/` (e.g. `/opt/sonar/extensions/plugins/`)
@@ -18,6 +24,7 @@ Add custom repositories to the SonarQube marketplace (SonarQube update center). 
 
 **ATTENTION:** SonarQube plugins might be harmful. Be careful, which URLs you use as your additional repositories! Use only trusted plugins and repositories! You use the Open Marketplace at your own risk.
 
+<a name="for_developers"/>
 # Are you plugin developer?
 
 1. Publish a plain text description of your plugin.
@@ -67,7 +74,11 @@ publicVersions=6.7,6.7.1,6.7.2,6.7.3,6.7.4,6.7.5,6.7.6,7.0,7.1,7.2,7.2.1,7.3,7.4
 
 2. SonarQube Marketplace ensures the compatibility of installed SonarQube version with the available plugins. If your plugin is not deployed officially, you must keep track of the compatibility by yourself. This is error-prone, since the file-system-based installation and update are not validated automatically. Open Marketplace allows you and your users to benefit from the consistency checks.
 
+<a name="for_admins"/>
+# How it works
 
+<a name="disclosure"/>
 
+# Disclosure
 
 *THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.*
