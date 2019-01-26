@@ -76,7 +76,7 @@ publicVersions=6.7,6.7.1,6.7.2,6.7.3,6.7.4,6.7.5,6.7.6,7.0,7.1,7.2,7.2.1,7.3,7.4
 
 2. SonarQube Marketplace ensures the compatibility of installed SonarQube version with the available plugins. If your plugin is not deployed officially, you must keep track of the compatibility by yourself. This is error-prone, since the file-system-based installation and update are not validated automatically. Open Marketplace allows you and your users to benefit from the consistency checks.
 
-<a name="for_admins"/>
+<a name="how_it_works"/>
 
 # How it works
 
@@ -94,21 +94,21 @@ The default URL for the update center can be changed by means of the property `s
 
 ## SonarQube Open Marketplace
 
-SonarQube plugin API allows creation of web pages and web services. We use this technique in order to implement a (kind of) servlet and bind it to the URL "/setup/openmarketplace". Now what happes, when the URL `http://<sonarserver>/setup/openmarketplace` is called
+SonarQube plugin API allows creation of web pages and web services. We use this technique in order to implement a (kind of) servlet and bind it to the URL "/setup/openmarketplace". Now what happes, when the URL `http://<sonarserver>/setup/openmarketplace` is called:
 
 1. we download the [original update center](https://update.sonarsource.org/update-center.properties).
-2. we read the value of `sonar.openmarketplace.urls`. This is our own plugin property. It allows you to specify additional update centers / repositories. You can edit this list from the settings Web UI (see `http://<sonarserver>/admin/settings?category=open+marketplace`). Our plugin suggests a list of trustworthy repositories by default. Among others their is our own repository https://raw.githubusercontent.com/ivangalkin/sonar-openmarketplace-plugin/master/update-center.properties. Each admin can add more custom repositories to this list and/or change the existing ones.
-3. we download each custom repository and merge its plugins with the original list (1)
+2. we read the value of `sonar.openmarketplace.urls`. This is our own plugin property. It allows you to specify additional update centers / repositories. You can edit this list from the Settings Web UI (see `http://<sonarserver>/admin/settings?category=open+marketplace`). Our plugin suggests a list of trustworthy repositories by default. Among others there is our own repository https://raw.githubusercontent.com/ivangalkin/sonar-openmarketplace-plugin/master/update-center.properties. Each admin can add more custom repositories to this list and/or change the existing ones.
+3. we download each custom repository and merge its plugins with the original list (see 1)
 4. the resulting list is available under the URL `http://<sonarserver>/setup/openmarketplace`.
 
 Also we provide an URL `http://<sonarserver>/api/openmarketplace/selftest`. Open this URL in order to retrace all steps from above.
 
-Now we are able to extend the orignal update center with custom repositories. The extended list of plugins becomes effective if you change the default update center URL to `http://localhost:9000/setup/openmarketplace` (you might want to adapt the port if necessary). In order to do so, please put the line...
+Now we are able to extend the orignal update center with the custom repositories. Our extended list of plugins becomes effective if you change the default update center URL with `http://localhost:9000/setup/openmarketplace` (you might want to adapt the port if necessary). In order to do so, please put the line...
 
 ```PROPERTIES
 sonar.updatecenter.url=http\://localhost\:9000/setup/openmarketplace
 ```
-... at the bottom of the file `<sonar installation home>/conf/sonar.properties`. 
+... at the bottom of the file `<sonar installation home>/conf/sonar.properties`. At the moment this property is hidden, so you can not change it through the Settings Web UI.
 
 Please follow the [installation manual](#for_admins) and you'll extend your **original** Marketplace and apply all its useful features to custom plugins.
 
