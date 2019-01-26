@@ -17,7 +17,7 @@ Add custom repositories to the SonarQube marketplace (SonarQube update center). 
 3. Restart your SonarQube server
 4. Now you can add custom plugin repositories additionally to the original one
    * Go to `http://<sonarserver>/admin/settings?category=open+marketplace`
-   * Parametrize your custom repositories
+   * Parametrize your custom repositories by means of the property `sonar.openmarketplace.urls`
    * Validate your configuration by means of the selftest: `http://<sonarserver>/api/openmarketplace/selftest`
 5. SonarQube updates its Marketplace only once an hour. So it might be faster to restart the SonarQube server in order to force the refresh.
 
@@ -79,6 +79,41 @@ publicVersions=6.7,6.7.1,6.7.2,6.7.3,6.7.4,6.7.5,6.7.6,7.0,7.1,7.2,7.2.1,7.3,7.4
 <a name="for_admins"/>
 
 # How it works
+
+## SonarQube Marketplace
+
+By default all plugins which appear in the SonarQube marketplace (`http://<sonarserver>/admin/marketplace`) are fetched from the internet. The official repository (also known as "update center") is located under the URL https://update.sonarsource.org/update-center.properties. It provides a list of all ["deployed"](https://docs.sonarqube.org/display/DEV/Deploying+to+the+Marketplace) plugins, their available releases, information about the compatibility with different SonarQube versions etc. Each time you visit the Marketplace Web UI, SonarQube downloads the mentioned list of plugins, parses and analyses it. As result you'll see
+
+1. which plugins are already installed
+2. which installed plugins can be updated
+3. which plugins can be also installed
+
+For 2) and 3) update center is required. In order to provide all available options for installation and update, SonarQube server compares the list of installed plugins and their versions with the downloaded list. Compatibility with your particular SonarQube version is taken into account.
+
+The default URL for the update center can be changed by means of the property `sonar.updatecenter.url`. That means, that one can use the standard Marketplace Web UI and all its great features with the altered list of plugins.
+
+## SonarQube Open Marketplace
+
+SonarQube plugin API allows creation of web pages and web services. We use this technique in order to implement a (kind of) servlet and bind it to the URL "/setup/openmarketplace". Now what happes, when the URL `http://<sonarserver>/setup/openmarketplace` is called
+
+1. we download the [original update center](https://update.sonarsource.org/update-center.properties).
+2. we read the value of `sonar.openmarketplace.urls`. This is our own plugin property. It allows you to specify additional update centers / repositories. You can edit this list from the settings Web UI (see `http://<sonarserver>/admin/settings?category=open+marketplace`). Our plugin suggests a list of trustworthy repositories by default. Among others their is our own repository https://raw.githubusercontent.com/ivangalkin/sonar-openmarketplace-plugin/master/update-center.properties. Each admin can add more custom repositories to this list and/or change the existing ones.
+3. we download each custom repository and merge its plugins with the original list (1)
+4. the resulting list is available under the URL `http://<sonarserver>/setup/openmarketplace`.
+
+Also we provide an URL `http://<sonarserver>/api/openmarketplace/selftest`. Open this URL in order to retrace all steps from above.
+
+Now we are able to extend the orignal update center with custom repositories. The extended list of plugins becomes effective if you change the default update center URL to `http://localhost:9000/setup/openmarketplace` (you might want to adapt the port if necessary). In order to do so, please put the line...
+
+```PROPERTIES
+sonar.updatecenter.url=http\://localhost\:9000/setup/openmarketplace
+```
+... at the bottom of the file `<sonar installation home>/conf/sonar.properties`. 
+
+Please follow the [installation manual](#for_admins) and you'll extend your **original** Marketplace and apply all its useful features to custom plugins.
+
+**IMPORTANT**: we don't aim to hide or fake the original plugins. From that reason we always download the original update center. Also we don't allow custom repositories to provide plugin IDs, which are already listed in the original update center. Nevertheless we are not able to protect you from malicious plugins. Please be careful, which custom repositories you add to your Marketplace. Safety of your SonarQube installation is your own responsibility.
+
 
 <a name="disclosure"/>
 
